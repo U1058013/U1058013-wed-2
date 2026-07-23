@@ -1,103 +1,61 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
-    <!-- 客語文字顯示 CSS -->
-    <link href="https://tauhu.tw/tauhu-oo.css" rel="stylesheet">
-    <style type="text/css">
-      body{font-family: tauhu-oo, PingFangTC-Regular, "Microsoft JhengHei", sans-serif;}
-
-    </style>
-
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>財富羅盤 Wealth Compass</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
-<nav class="navbar bg-dark">
-  <div class="container">
-    <a class="justify-content-center" href="#">
-      <img width="150" src="https://occ-0-1068-1723.1.nflxso.net/dnm/api/v6/TsSRXvDuraoJ7apdkH6tsHhf-ZQ/AAAABf9ItAsDiVo6LHL9jQ_tuEzHWYmD7F7DiOzjLqygVtQCnnimCkSKZEf_gbW97ct9IUBoyZDo96FT9UkJo2EIVW0XdJguaQaOpvX_.png" alt="鬼滅之刃">
-    </a>
-  </div>
-</nav>
-<p>
-<div class="accordion accordion-flush" id="accordionFlushExample">
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="flush-headingOne">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-        特別節目『鬼殺隊報 -アニメ「鬼滅の刃」２大イベント発表SP-』將發行！
-      </button>
-    </h2>
-    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-      <div class="accordion-body"><pre>除了回顧 TV 卡通「Kimetsu no Yaiba」Yukaku 的故事之外，
-我們還將公佈計劃於今年 2022 年舉行的兩大活動和最新信息。
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useEffect, useState } = React;
 
-[發行日期和節目 URL]
-■ 發行日期：
-2022 年 1 月 18 日星期二晚上 8:00 ~
+    const themes = {
+      obsidian: { name:'黑曜石', icon:'🖤', bg:'#0b0c10', sur:'#12151d', card:'#191d27', bor:'#2d3444', acc:'#c9a84c', accl:'#f5da78', accb:'rgba(201,168,76,.16)', tea:'#43d17a', ros:'#ff657a', blu:'#4da3ff', pur:'#a779ff', txt:'#f5f0df', sub:'#b7ad92', mut:'#68604d', grad:'linear-gradient(135deg,#c9a84c,#f5da78)', fh:'Noto Serif TC', fb:'Noto Sans TC' },
+      aurora: { name:'極光', icon:'🌊', bg:'#06131f', sur:'#0a1d2e', card:'#10283d', bor:'#1d4764', acc:'#00d4ff', accl:'#7df2ff', accb:'rgba(0,212,255,.14)', tea:'#39ffb0', ros:'#ff5d9e', blu:'#43a8ff', pur:'#9a7cff', txt:'#ecfbff', sub:'#9cc7d6', mut:'#507081', grad:'linear-gradient(135deg,#00d4ff,#7df2ff)', fh:'Noto Serif TC', fb:'Noto Sans TC' },
+      sakura: { name:'櫻花', icon:'🌸', bg:'#fff7fa', sur:'#fff0f5', card:'#ffffff', bor:'#f2c9d6', acc:'#d4517a', accl:'#ff94b2', accb:'rgba(212,81,122,.12)', tea:'#1fab7a', ros:'#d4517a', blu:'#308ce8', pur:'#8c5be8', txt:'#39242c', sub:'#87606e', mut:'#d8aebe', grad:'linear-gradient(135deg,#d4517a,#ff94b2)', fh:'Noto Serif TC', fb:'Noto Sans TC' },
+      forest: { name:'森林', icon:'🌿', bg:'#07140d', sur:'#0f2115', card:'#172b1c', bor:'#2d4b35', acc:'#5dd87c', accl:'#b6f5a6', accb:'rgba(93,216,124,.14)', tea:'#5dd87c', ros:'#ff716b', blu:'#6bb9ff', pur:'#b086ff', txt:'#f1fff0', sub:'#a9c8a8', mut:'#5e785f', grad:'linear-gradient(135deg,#5dd87c,#b6f5a6)', fh:'Noto Serif TC', fb:'Noto Sans TC' }
+    };
+    const expCats = ['餐飲','交通','購物','娛樂','醫療','教育','住房','訂閱','其他'];
+    const incCats = ['薪資','投資收益','兼職','獎金','禮金','其他'];
+    const fmt = n => 'NT$' + Math.round(n || 0).toLocaleString('zh-TW');
+    const today = () => new Date().toISOString().slice(0,10);
+    const uid = () => Math.random().toString(36).slice(2,10);
 
-■ 發行渠道：
-Aniplex 官方 Youtube 頻道
-ABEMA 動漫頻道 節目 URL：<a href="https://abema.tv/channels/abema-anime/slots/E2bUf5C4DYDD8j">https ://abema.tv/channels/abema-anime/ slot / E2bUf5C4DYDD8j</a>
+    function genCSS(t){ return `
+      :root{--bg:${t.bg};--sur:${t.sur};--card:${t.card};--bor:${t.bor};--acc:${t.acc};--accl:${t.accl};--accb:${t.accb};--tea:${t.tea};--ros:${t.ros};--blu:${t.blu};--pur:${t.pur};--txt:${t.txt};--sub:${t.sub};--mut:${t.mut};--grad:${t.grad};--fh:${t.fh};--fb:${t.fb}}
+      *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 10% 0,var(--accb),transparent 35%),var(--bg);color:var(--txt);font-family:var(--fb),sans-serif} button,input,select,textarea{font:inherit} button{cursor:pointer}
+      .app{min-height:100vh;padding-bottom:100px}.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--sur) 90%,transparent);backdrop-filter:blur(18px);border-bottom:1px solid var(--bor);padding:16px 20px}.topin{max-width:640px;margin:auto;display:flex;align-items:center;justify-content:space-between}.brand h1{font-family:var(--fh);font-size:25px;margin:0}.brand p{margin:3px 0 0;color:var(--sub);font-size:13px}.iconBtn,.btn{border:1px solid var(--bor);background:var(--card);color:var(--txt);border-radius:16px;padding:10px 14px}.content{max-width:640px;margin:auto;padding:18px}.hero{background:var(--grad);color:#111;border-radius:32px;padding:24px;box-shadow:0 20px 50px #0004}.hero .big{font-size:42px;font-weight:900;letter-spacing:-1px}.grid{display:grid;gap:14px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.card{background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--bor);border-radius:26px;padding:18px;box-shadow:0 10px 30px #0002}.label{color:var(--sub);font-size:13px}.val{font-weight:900;font-size:22px}.section{font-family:var(--fh);font-size:21px;margin:24px 0 12px}.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bor);z-index:6}.tabsin{max-width:640px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);padding:10px 8px 16px}.tab{background:transparent;border:0;color:var(--sub);display:grid;gap:4px;place-items:center}.tab.active{color:var(--acc)}.tab.home{transform:translateY(-22px)}.tab.home span:first-child{background:var(--grad);color:#111;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;box-shadow:0 12px 24px #0004}.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.field{width:100%;border:1px solid var(--bor);background:var(--sur);color:var(--txt);border-radius:16px;padding:12px;margin:6px 0}.btn.primary{background:var(--grad);color:#111;border:0;font-weight:800}.pill{display:inline-flex;padding:7px 11px;border-radius:999px;background:var(--accb);color:var(--acc);font-weight:700;font-size:12px}.bar{height:10px;border-radius:99px;background:var(--sur);overflow:hidden}.bar i{display:block;height:100%;background:var(--grad);border-radius:99px}.ai{border-left:4px solid var(--acc);background:var(--accb)}.list{display:grid;gap:10px}.tx{display:flex;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--bor);border-radius:18px;background:var(--sur)}.neg{color:var(--ros)}.pos{color:var(--tea)}.modalBg{position:fixed;inset:0;background:#0008;z-index:9;display:grid;align-items:end}.modal{background:var(--card);border:1px solid var(--bor);border-radius:28px 28px 0 0;padding:22px;max-width:640px;width:100%;margin:auto}.donut{display:flex;align-items:center;gap:18px}.legend{display:grid;gap:8px;flex:1}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}.mini{font-size:12px;color:var(--sub)} input[type=range]{width:100%;accent-color:var(--acc)} @media(max-width:430px){.hero .big{font-size:34px}.g3{grid-template-columns:1fr}.content{padding:14px}.card{padding:15px}}`; }
+    function DonutChart({data}){ const total=data.reduce((a,b)=>a+b.value,0)||1; let off=25; return <div className="donut"><svg width="128" height="128" viewBox="0 0 42 42">{data.map((d,i)=>{const dash=d.value/total*100; const el=<circle key={d.name} cx="21" cy="21" r="15.9" fill="none" stroke={d.color} strokeWidth="7" strokeDasharray={`${dash} ${100-dash}`} strokeDashoffset={off}/>; off-=dash; return el})}<circle cx="21" cy="21" r="10" fill="var(--card)"/><text x="21" y="22.5" textAnchor="middle" fill="var(--txt)" fontSize="5" fontWeight="800">{Math.round(total).toLocaleString()}</text></svg><div className="legend">{data.map(d=><div key={d.name} className="mini"><span className="dot" style={{background:d.color}}/> {d.name} · {fmt(d.value)}</div>)}</div></div> }
+    function CircProg({pct}){ return <div style={{display:'grid',placeItems:'center'}}><svg width="110" height="110" viewBox="0 0 120 120"><circle cx="60" cy="60" r="48" stroke="var(--sur)" strokeWidth="12" fill="none"/><circle cx="60" cy="60" r="48" stroke="var(--acc)" strokeWidth="12" fill="none" strokeLinecap="round" strokeDasharray={`${Math.min(100,pct)*3.01} 301`} transform="rotate(-90 60 60)"/><text x="60" y="67" textAnchor="middle" fill="var(--txt)" fontSize="22" fontWeight="900">{Math.round(pct)}%</text></svg></div> }
+    function AiBubble({children}){ return <div className="card ai">💡 {children || 'AI 正在整理專屬理財提醒…'}</div> }
 
-■ 表演者：花江夏
-樹
-MC：Yuma Takahashi（Aniplex）
-
-*即使分發後也可以免費觀看。</pre></div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="flush-headingTwo">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-        鬼滅の刃 x 明治美味牛奶活動決定了！
-      </button>
-    </h2>
-    <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-      <div class="accordion-body">
-      	<table>
-      		<tr>
-      			<td>
-      				<img width="250" src="https://kimetsu.com/news/SYS/CONTENTS/d507935e-cbba-487a-91d7-8705733ab518/w776">
-      			</td>
-      			<td>
-      				<pre>【鬼滅の刃】×【明治おいしい牛乳】
-ufotable【明治おいしい牛乳隊】 繪製的插畫又回來了！️活動
- 
-贏取5959原創商品！！
- 
-期間
-1月11日-3月11日
- 
-點擊這裡了解詳情
-<a href="https://www.meijioishiigyunyu.com/campaign/">https://www.meijioishiigyunyu.com/campaign/</a></pre>
-      			</td>
-      		</tr>
-      	</table>
-      	
-      	</div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="flush-headingThree">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-       《遊鶴篇》第 6 集：播出後公開的劇情簡介、工作人員名單和場景剪輯！
-      </button>
-    </h2>
-    <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
-      <div class="accordion-body">第六集《重疊的回憶》播出後，劇情簡介、工作人員演職員表、場景剪輯等都已公開。
-請看一下。
- 
-▶ 詳情請看<a href="https://kimetsu.com/anime/yukakuhen/story/" target="_blank">概要</a></div>
-    </div>
-  </div>
-</div>
-  <p>𠊎係乞食命皇帝嘴，好食懶做，下二擺愛仰般搞𪹚龍？ 𪘒𪹚𫝘𫟧𫠛𫣆𬠖󿕅</p>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
+    function App(){
+      const [theme,setTheme]=useState('obsidian'), [page,setPage]=useState('home'), [settings,setSettings]=useState(false);
+      const [tx,setTx]=useState([{id:uid(),name:'薪資入帳',cat:'薪資',amount:72000,type:'income',date:today(),note:'',src:'manual'},{id:uid(),name:'午餐',cat:'餐飲',amount:180,type:'expense',date:today(),note:'便當',src:'manual'},{id:uid(),name:'捷運',cat:'交通',amount:60,type:'expense',date:today(),note:'',src:'manual'},{id:uid(),name:'串流訂閱',cat:'訂閱',amount:320,type:'expense',date:today(),note:'',src:'manual'}]);
+      const [assets,setAssets]=useState([{id:uid(),name:'活存',cat:'現金',value:180000,sub:'緊急預備金',color:'#00d4ff'},{id:uid(),name:'ETF 投資',cat:'股票',value:420000,sub:'0050',isStock:true,ticker:'0050',shares:10,color:'#5dd87c'}]);
+      const [liab,setLiab]=useState([{id:uid(),name:'信用卡未繳',value:12800,note:'本期帳單'}]);
+      const [wishes,setWishes]=useState({want:[{id:uid(),emoji:'✈️',name:'日本旅行',budget:80000,saved:26000,note:'秋天出發'}],need:[{id:uid(),emoji:'💻',name:'工作筆電',budget:55000,saved:18000,note:'提升效率'}],must:[{id:uid(),emoji:'🛡️',name:'保險年繳',budget:36000,saved:24000,note:'必要保障'}]});
+      const [ret,setRet]=useState({currentAge:32,retireAge:60,retireMonthly:70000,currentSaving:600000,monthlyContrib:18000,annualRate:6});
+      useEffect(()=>{let s=document.getElementById('theme-css'); if(!s){s=document.createElement('style');s.id='theme-css';document.head.appendChild(s)} s.textContent=genCSS(themes[theme]);},[theme]);
+      const income=tx.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0), expense=tx.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0), assetTotal=assets.reduce((a,b)=>a+b.value,0), debt=liab.reduce((a,b)=>a+b.value,0), net=assetTotal-debt;
+      const need=ret.retireMonthly*12*25, n=(ret.retireAge-ret.currentAge)*12, r=ret.annualRate/100/12, fv=ret.currentSaving*Math.pow(1+r,n)+(r?ret.monthlyContrib*(Math.pow(1+r,n)-1)/r:ret.monthlyContrib*n), retirePct=fv/need*100;
+      const nav={home:'首頁儀表板',ledger:'記帳本',wish:'願望清單',assets:'總資產',retire:'退休目標'};
+      return <div className="app"><div className="top"><div className="topin"><div className="brand"><h1>財富羅盤</h1><p>Wealth Compass · {nav[page]}</p></div><button className="iconBtn" onClick={()=>setSettings(1)}>⚙️</button></div></div><main className="content">{page==='home'&&<Home {...{income,expense,net,retirePct,wishes,tx}}/>}{page==='ledger'&&<Ledger tx={tx} setTx={setTx}/>} {page==='wish'&&<Wish wishes={wishes} setWishes={setWishes}/>} {page==='assets'&&<Assets assets={assets} setAssets={setAssets} liab={liab} setLiab={setLiab} net={net}/>} {page==='retire'&&<Retire ret={ret} setRet={setRet} need={need} fv={fv} retirePct={retirePct}/>}</main><nav className="tabs"><div className="tabsin">{[['ledger','🧾','記帳'],['wish','🎯','願望'],['home','🧭','首頁'],['assets','💎','資產'],['retire','🏖️','退休']].map(x=><button key={x[0]} className={'tab '+(page===x[0]?'active ':'')+(x[0]==='home'?'home':'')} onClick={()=>setPage(x[0])}><span>{x[1]}</span><small>{x[2]}</small></button>)}</div></nav>{settings&&<Settings theme={theme} setTheme={setTheme} close={()=>setSettings(0)}/>}</div>
+    }
+    function Home(p){ const cats={}; p.tx.filter(t=>t.type==='expense').forEach(t=>cats[t.cat]=(cats[t.cat]||0)+t.amount); const data=Object.entries(cats).map(([name,value],i)=>({name,value,color:['#ff657a','#00d4ff','#a779ff','#5dd87c','#c9a84c'][i%5]})); const first=[...p.wishes.must,...p.wishes.need,...p.wishes.want][0]; return <><section className="hero"><div className="label" style={{color:'#222'}}>本月淨資產</div><div className="big">{fmt(p.net)}</div><div className="grid g3"><b>收入<br/>{fmt(p.income)}</b><b>支出<br/>{fmt(p.expense)}</b><b>結餘<br/>{fmt(p.income-p.expense)}</b></div></section><div className="section">AI 小叮嚀</div><AiBubble>結餘率良好，建議優先補足緊急預備金。</AiBubble><div className="grid g2" style={{marginTop:14}}><div className="card"><div className="label">退休進度</div><CircProg pct={p.retirePct}/></div><div className="card"><div className="label">願望首項</div><h3>{first.emoji} {first.name}</h3><div className="bar"><i style={{width:Math.min(100,first.saved/first.budget*100)+'%',background:first.saved>=first.budget?'var(--tea)':'var(--grad)'}}/></div><p className="mini">{fmt(first.saved)} / {fmt(first.budget)}</p></div></div><div className="section">本月支出</div><div className="card">{data.length?<DonutChart data={data}/>:<p>尚無支出</p>}</div><div className="section">最近交易</div><div className="list">{p.tx.slice(-4).reverse().map(t=><div className="tx" key={t.id}><span>{t.name}<br/><small className="mini">{t.cat} · {t.date}</small></span><b className={t.type==='income'?'pos':'neg'}>{t.type==='income'?'+':'-'}{fmt(t.amount)}</b></div>)}</div></> }
+    function Ledger({tx,setTx}){ const [f,setF]=useState({name:'',amount:'',cat:'餐飲',type:'expense',date:today(),note:''}); const add=()=>{if(!f.name||!f.amount)return; setTx([...tx,{...f,id:uid(),amount:+f.amount,src:'manual'}]); setF({...f,name:'',amount:'',note:''})}; const ai=()=>{setTx([...tx,{id:uid(),name:'AI 匯入：便利商店',cat:'餐飲',amount:95,type:'expense',date:today(),note:'文字/照片解析示範',src:'ai'}])}; return <><div className="row"><button className="iconBtn">‹</button><h2>2026 年 7 月</h2><button className="iconBtn">›</button></div><div className="card"><div className="row"><select className="field" value={f.type} onChange={e=>setF({...f,type:e.target.value,cat:e.target.value==='expense'?'餐飲':'薪資'})}><option value="expense">支出</option><option value="income">收入</option></select><select className="field" value={f.cat} onChange={e=>setF({...f,cat:e.target.value})}>{(f.type==='expense'?expCats:incCats).map(c=><option>{c}</option>)}</select></div><input className="field" placeholder="名稱" value={f.name} onChange={e=>setF({...f,name:e.target.value})}/><input className="field" type="number" placeholder="金額" value={f.amount} onChange={e=>setF({...f,amount:e.target.value})}/><input className="field" type="date" value={f.date} onChange={e=>setF({...f,date:e.target.value})}/><textarea className="field" placeholder="備注" value={f.note} onChange={e=>setF({...f,note:e.target.value})}/><button className="btn primary" onClick={add}>加入記錄</button> <button className="btn" onClick={ai}>🤖 AI 文字/照片匯入示範</button></div><div className="section">被動記帳串接</div><div className="grid g3"><span className="pill">🧾 雲端發票</span><span className="pill">💬 Line Pay</span><span className="pill">🏦 Open Banking</span></div><div className="section">交易明細</div><div className="list">{tx.map(t=><div className="tx" key={t.id}><span>{t.name}<br/><small className="mini">{t.cat} · {t.src}</small></span><b className={t.type==='income'?'pos':'neg'}>{fmt(t.amount)}</b></div>)}</div></> }
+    function Wish({wishes,setWishes}){ const addSave=(k,id,n)=>setWishes({...wishes,[k]:wishes[k].map(w=>w.id===id?{...w,saved:w.saved+n}:w)}); return <>{Object.entries({must:'🔑 必要',need:'📌 需要',want:'💫 想要'}).map(([k,title])=><section key={k}><div className="section">{title}</div>{wishes[k].map(w=><div className="card" key={w.id}><h3>{w.emoji} {w.name}</h3><div className="bar"><i style={{width:Math.min(100,w.saved/w.budget*100)+'%'}}/></div><p>{fmt(w.saved)} / {fmt(w.budget)}</p><div className="row"><button className="btn" onClick={()=>addSave(k,w.id,1000)}>+1,000</button><button className="btn" onClick={()=>addSave(k,w.id,10000)}>+1萬</button><button className="btn" onClick={()=>addSave(k,w.id,50000)}>+5萬</button></div><p className="mini">💡 先確認使用頻率與現金流，再決定購買時點。</p></div>)}</section>)}</> }
+    function Assets({assets,setAssets,liab,setLiab,net}){ const [a,setA]=useState({name:'',cat:'現金',value:'',sub:'',isStock:false,ticker:'',shares:''}); const add=()=>{if(!a.name)return; setAssets([...assets,{...a,id:uid(),value:+(a.value||a.shares*125||0),color:['#00d4ff','#5dd87c','#ff657a','#a779ff','#c9a84c'][assets.length%5]}]);}; const data=assets.map(x=>({name:x.cat,value:x.value,color:x.color})); return <><section className="hero"><div className="label" style={{color:'#222'}}>總淨資產</div><div className="big">{fmt(net)}</div></section><div className="section">資產配置</div><div className="card"><DonutChart data={data}/></div><div className="section">新增資產</div><div className="card"><input className="field" placeholder="資產名稱" onChange={e=>setA({...a,name:e.target.value})}/><select className="field" onChange={e=>setA({...a,cat:e.target.value,isStock:e.target.value==='股票'})}>{['現金','股票','不動產','退休金','保險','其他'].map(c=><option>{c}</option>)}</select>{a.isStock&&<div className="row"><input className="field" placeholder="股票代號" onChange={e=>setA({...a,ticker:e.target.value})}/><input className="field" type="number" placeholder="持股數" onChange={e=>setA({...a,shares:+e.target.value})}/></div>}<input className="field" type="number" placeholder="金額；股票可留空由 AI 估值示範" onChange={e=>setA({...a,value:e.target.value})}/><button className="btn primary" onClick={add}>新增資產</button></div><div className="list">{assets.map(x=><div className="tx" key={x.id}><span>{x.name}<br/><small className="mini">{x.cat} {x.ticker&&`· ${x.ticker}`}</small></span><b>{fmt(x.value)} 🔄</b></div>)}</div></> }
+    function Retire({ret,setRet,need,fv,retirePct}){ const labels={currentAge:'目前年齡',retireAge:'退休年齡',retireMonthly:'退休月支出',currentSaving:'目前已存',monthlyContrib:'每月投入'}; const slider=(k,min,max,step=1)=><><div className="row"><span>{labels[k]}</span><b>{k.includes('Age')?ret[k]+' 歲':fmt(ret[k])}</b></div><input type="range" min={min} max={max} step={step} value={ret[k]} onChange={e=>setRet({...ret,[k]:+e.target.value})}/></>; return <><section className="hero"><div className="label" style={{color:'#222'}}>退休所需資產</div><div className="big">{fmt(need)}</div><p>預估終值 {fmt(fv)} · {retirePct>=100?'已達標':'缺口 '+fmt(need-fv)}</p></section><div className="card"><CircProg pct={retirePct}/>{slider('currentAge',18,65)}{slider('retireAge',40,80)}{slider('retireMonthly',20000,300000,5000)}{slider('currentSaving',0,5000000,50000)}{slider('monthlyContrib',0,100000,1000)}<div className="row"><span>年化報酬率</span><b>{ret.annualRate}%</b></div><input type="range" min="1" max="15" value={ret.annualRate} onChange={e=>setRet({...ret,annualRate:+e.target.value})}/></div><AiBubble>1. 提高月投入。 2. 延後退休。 3. 降低退休花費。</AiBubble></> }
+    function Settings({theme,setTheme,close}){ return <div className="modalBg" onClick={close}><div className="modal" onClick={e=>e.stopPropagation()}><h2>設定</h2><div className="grid g2">{Object.entries(themes).map(([k,t])=><button className={'btn '+(theme===k?'primary':'')} onClick={()=>setTheme(k)}>{t.icon} {t.name}</button>)}</div><p className="mini">貨幣：TWD · 語言：繁體中文</p><button className="btn" onClick={close}>關閉</button></div></div> }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
 </body>
 </html>
